@@ -39,13 +39,13 @@ map.on('load', () => {
     map.addSource('park-data', {
         //adding green space geojson file
         type: 'geojson',
-        data: 'https://raw.githubusercontent.com/natalikec/Lab2/main/green_spaces.geojson'
+        data: 'https://github.com/natalikec/Lab3/blob/c95ad542e548eb35f859a4c42d670447b11b5d01/Data_Lab3/green_spaces%20copy.geojson'
     });
 
     map.addSource('heatrelief-data', {
         //adding heat relief geojson file
         type: 'geojson',
-        data: 'https://raw.githubusercontent.com/natalikec/Lab2/main/Air%20Conditioned%20and%20Cool%20Spaces.geojson',
+        data: 'https://github.com/natalikec/Lab3/blob/c95ad542e548eb35f859a4c42d670447b11b5d01/Data_Lab3/Air%20Conditioned%20and%20Cool%20Spaces%20copy.geojson',
     });
 
     map.addLayer({
