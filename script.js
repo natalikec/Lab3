@@ -39,13 +39,14 @@ map.on('load', () => {
     map.addSource('park-data', {
         //adding green space geojson file
         type: 'geojson',
-        data: 'https://github.com/natalikec/Lab3/blob/c95ad542e548eb35f859a4c42d670447b11b5d01/Data_Lab3/green_spaces%20copy.geojson'
+        data: 'https://raw.githubusercontent.com/natalikec/Lab2/main/green_spaces.geojson',
+        'generateId': true //Create a unique ID for each feature
     });
 
     map.addSource('heatrelief-data', {
         //adding heat relief geojson file
         type: 'geojson',
-        data: 'https://github.com/natalikec/Lab3/blob/c95ad542e548eb35f859a4c42d670447b11b5d01/Data_Lab3/Air%20Conditioned%20and%20Cool%20Spaces%20copy.geojson',
+        data: 'https://raw.githubusercontent.com/natalikec/Lab3/main/Data_Lab3/Air%20Conditioned%20and%20Cool%20Spaces%20copy.geojson',
     });
 
     map.addLayer({
@@ -59,10 +60,49 @@ map.on('load', () => {
         'paint': {
             'fill-color': 'hsl(143, 36%, 37%)',
             //green color
-            'fill-opacity': 0.99
-            //almost no opacity 
-        },
+            'fill-opacity': [
+                'case',
+                ['boolean', ['feature-state', 'hover'], false],
+                1,
+                0.5]
+            //Creating an event 
+        }
     });
+/*--------------------------------------------------------------------
+HOVER EVENT USING setFeatureState() METHOD
+// --------------------------------------------------------------------*/
+let parkID = null; //Declare initial province ID as null
+
+map.on('mousemove', 'park-polygon', (e) => {
+    if (e.features.length > 0) { //If there are features in array enter conditional
+
+        if (parkID !== null) { //If provID IS NOT NULL set hover feature state back to false to remove opacity from previous highlighted polygon
+            map.setFeatureState(
+                { source: 'park-data', id: parkID },
+                { hover: false }
+            );
+        }
+
+        parkID = e.features[0].id; //Update provID to featureID
+        map.setFeatureState(
+            { source: 'park-data', id: parkID },
+            { hover: true } //Update hover feature state to TRUE to change opacity of layer to 1
+        );
+    }
+});
+
+
+map.on('mouseleave', 'park-polygon', () => { //If mouse leaves the geojson layer, set all hover states to false and provID variable back to null
+    if (parkID !== null) {
+        map.setFeatureState(
+            { source: 'park-data', id: parkID },
+            { hover: false }
+        );
+    }
+    parkID = null;
+});
+
+
 
     map.addLayer({
         //adding a layer with the heat relief netowork
@@ -106,39 +146,55 @@ map.on('load', () => {
                 ['==', ['id'], hoveredFeatureId], 'red', // Turn hovered marker red
                 ['match',
                     ['get', 'locationCode'],
-                    'SPLASHPAD','#5c99b5',
-                    'POOL','#1b79d1',
-                    'INDOOR POOL','#1b79d1',
-                    'OUTDOOR POOL','#1b79d1',
-                    'WADING POOL','#1b79d1',
-                    'LIBRARY','#e3a92b',
-                    'COMM_CNTR','#1659cc',
-                    'SSHA_SHELTER','#795cbf',
+                    'SPLASHPAD', '#5c99b5',
+                    'POOL', '#1b79d1',
+                    'INDOOR POOL', '#1b79d1',
+                    'OUTDOOR POOL', '#1b79d1',
+                    'WADING POOL', '#1b79d1',
+                    'LIBRARY', '#e3a92b',
+                    'COMM_CNTR', '#1659cc',
+                    'SSHA_SHELTER', '#795cbf',
                     '#3b3b40'
                 ] // Keep other markers as their original colors
-            ]); 
+            ]);
         });
-    
+
         // Add event listener for mouseleave
         map.on('mouseleave', 'center-points', () => {
             // Revert marker color when mouse leaves
             map.setPaintProperty('center-points', 'circle-color', [
                 'match',
                 ['get', 'locationCode'],
-                'SPLASHPAD','#5c99b5',
-                'POOL','#1b79d1',
-                'INDOOR POOL','#1b79d1',
-                'OUTDOOR POOL','#1b79d1',
-                'WADING POOL','#1b79d1',
-                'LIBRARY','#e3a92b',
-                'COMM_CNTR','#1659cc',
-                'SSHA_SHELTER','#795cbf',
+                'SPLASHPAD', '#5c99b5',
+                'POOL', '#1b79d1',
+                'INDOOR POOL', '#1b79d1',
+                'OUTDOOR POOL', '#1b79d1',
+                'WADING POOL', '#1b79d1',
+                'LIBRARY', '#e3a92b',
+                'COMM_CNTR', '#1659cc',
+                'SSHA_SHELTER', '#795cbf',
                 '#3b3b40'
             ]); // Define your color logic here
         });
     });
 
-
+    //Using Checked box to add and remove layers
+    //For Park Polygon
+    document.getElementById('polygoncheck').addEventListener('change', (e) => {
+        map.setLayoutProperty(
+            'park-polygon',
+            'visibility',
+            e.target.checked ? 'visible' : 'none'
+        );
+    });
+    //For Points
+    document.getElementById('pointcheck').addEventListener('change', (e) => {
+        map.setLayoutProperty(
+            'center-points',
+            'visibility',
+            e.target.checked ? 'visible' : 'none'
+        );
+    });
 
     // Adding pop up for heat relief center points showing what type of facility it is
     map.on('click', 'center-points', (e) => {
@@ -170,6 +226,7 @@ const legendlabels = [
     'Community Centre',
     'SSHA Shelter',
     'Other',
+    'Green Space',
     '(Click on dot to find location name)'
 ];
 
@@ -179,7 +236,8 @@ const legendcolours = [
     '#e3a92b',
     '#1659cc',
     '#795cbf',
-    '#3b3b40'
+    '#3b3b40',
+    'hsl(143, 36%, 37%)'
 
 ];
 
