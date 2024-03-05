@@ -68,22 +68,22 @@ map.on('load', () => {
             //Creating an event 
         }
     });
-/*--------------------------------------------------------------------
-HOVER EVENT USING setFeatureState() METHOD
-// --------------------------------------------------------------------*/
-let parkID = null; //Declare initial province ID as null
+
+//HOVER EVENT Over Parks Plygons - USING setFeatureState() METHOD
+
+let parkID = null; //Declare initial ID as null
 
 map.on('mousemove', 'park-polygon', (e) => {
     if (e.features.length > 0) { //If there are features in array enter conditional
 
-        if (parkID !== null) { //If provID IS NOT NULL set hover feature state back to false to remove opacity from previous highlighted polygon
+        if (parkID !== null) { //If parkID is not null, set hover feature state back to false to remove opacity from previous highlighted polygon
             map.setFeatureState(
                 { source: 'park-data', id: parkID },
                 { hover: false }
             );
         }
 
-        parkID = e.features[0].id; //Update provID to featureID
+        parkID = e.features[0].id; //Update parkID to featureID
         map.setFeatureState(
             { source: 'park-data', id: parkID },
             { hover: true } //Update hover feature state to TRUE to change opacity of layer to 1
@@ -92,7 +92,7 @@ map.on('mousemove', 'park-polygon', (e) => {
 });
 
 
-map.on('mouseleave', 'park-polygon', () => { //If mouse leaves the geojson layer, set all hover states to false and provID variable back to null
+map.on('mouseleave', 'park-polygon', () => { //If mouse leaves the geojson layer, set all hover states to false and parkID variable back to null
     if (parkID !== null) {
         map.setFeatureState(
             { source: 'park-data', id: parkID },
